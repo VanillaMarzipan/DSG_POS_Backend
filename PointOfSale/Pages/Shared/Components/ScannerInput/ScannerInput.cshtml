@@ -1,0 +1,33 @@
+﻿@model Models.UpcLookupResult
+
+@{ 
+    String UpcErrorMessage = String.Empty;
+    bool ShowLookupError = false;
+
+    if (Model != null && !Model.Success)
+    {
+        UpcErrorMessage = $"UPC {Model.Upc} not found";
+        ShowLookupError = true;
+    }
+}
+
+<div class="leftSideScanBox">
+    <div class="container">
+        <div class="col-8 offset-md-2">
+            <form asp-page-handler="enter" method="post">
+                <div class="row">
+                    <div class="input-group input-group-lg">
+                        <input type="text" name="barcodeData" id="barcodeText" class="form-control rounded-right @(ShowLookupError ? "is-invalid" : String.Empty)" placeholder="Scan or type receipt, scorecard, or UPC" required>
+                        <div class="invalid-feedback">@UpcErrorMessage</div>
+                    </div>
+                </div>
+                <div class="row">&nbsp;</div>
+                <div class="row">
+                    <div class="col-4 offset-md-8 pr-0">
+                        <button type="submit" id="enterBarcodeButton" class="btn btn-dsg btn-lg btn-block float-right">ENTER</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

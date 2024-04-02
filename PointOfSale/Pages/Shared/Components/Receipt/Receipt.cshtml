@@ -1,0 +1,221 @@
+﻿@using Services
+@using Response = DSG.POS.PosTransactionManager.Models.Response
+@model Models.ReceiptViewModel
+
+<style>
+    .card-receipt hr {
+        margin-top: 8px;
+        margin-bottom: 2px;
+    }
+
+    .card-receipt .receipt-scorecard-adj {
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    .card-receipt .receipt-item-layout-adj {
+        padding-left: 0px !important;
+        padding-right: 28px !important;
+    }
+
+    .card-receipt .receipt-total {
+        color: black;
+        font-weight: bold;
+    }
+
+    .card-receipt .receipt-discounts {
+        color: red;
+    }
+
+    .card-receipt .card-footer p {
+        line-height: 14px;
+    }
+
+    .card-receipt table {
+        width: 100%;
+    }
+
+    .card-receipt .void {
+        color: maroon;
+        text-align: right;
+    }
+
+        .card-receipt .void i {
+            font-size: 24pt;
+            position: relative;
+            top: -6px;
+        }
+
+        .card-receipt .void span {
+            font-size: x-small;
+            font-weight: bold;
+            position: relative;
+            top: +8px;
+            left: -26px;
+        }
+
+    .receipt-item-layout-adj table {
+        margin-left: +15px !important;
+    }
+
+        .receipt-item-layout-adj table .receipt-item-selected-item-indicator {
+            width: 27px !important;
+        }
+
+        .receipt-item-layout-adj table .receipt-item-edit-menu {
+            width: 32px !important;
+        }
+
+        .receipt-item-layout-adj table .receipt-item-price {
+            text-align: right;
+            padding-right: 10px;
+        }
+
+        .receipt-item-layout-adj table .receipt-item-quantity {
+            text-align: right;
+            padding-right: 10px;
+        }
+
+    .receipt-item div.dropdown i {
+        position: relative;
+        top: +6px;
+        left: -2px;
+    }
+
+    .receipt-item div.dropdown span {
+        font-size: x-small;
+        font-weight: bold;
+        position: relative;
+        top: -1px;
+        left: -6px;
+        color: black;
+    }
+
+    .receipt-item-to-scroll-to {
+    }
+</style>
+@if (!Model.ShowReceiptPrinted)
+{
+    <div class="card card-receipt">
+        <div class="card-header" style="background-color: #f1f1f1 !important;font-size:14pt;border:0;padding-bottom:5px">
+            <table cellpadding="0" cellspacing="0">
+                <tr>
+                    <td>Sale Transaction</td>
+                    <td class="void"><i class="fa fa-times-circle"></i><span>VOID</span></td>
+                </tr>
+            </table>
+            <hr />
+        </div>
+        <div class="card-body receipt-scorecard-adj" style="background-color: #f1f1f1 !important;">
+            <table cellpadding="0" cellspacing="0">
+                <tr>
+                    <td><img src="~/img/scoreCard_147x93.png" alt="SCORECard" style="width:99px !important;height:auto !important;"></td>
+                    <td style="text-align:right;">
+                        <div class="input-group input-group-lg">
+                            <input type="text" name="athletePhone" id="athletePhone" class="form-control" placeholder="( ___ ) ___ - ____">
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <hr />
+        </div>
+        <div class="card-body receipt-item-layout-adj" style="background-color: #f1f1f1 !important;height:298px !important;max-height:304px !important;overflow-y:scroll;overflow-x:hidden;">
+            @if (Model.Transaction?.Items?.Count() > 0)
+            {
+                Response.Item selectedItem = Model.Transaction.Items.OrderByDescending(a => a.TransactionItemIdentifier).First();
+
+                foreach (var item in Model.Transaction.Items)
+                {
+                    Models.ReceiptItem receiptItem = new Models.ReceiptItem()
+                    {
+                        Description = item.Description,
+                        Price = item.UnitPrice * item.Quantity,
+                        Quantity = item.Quantity,
+                        TransactionItemIdentifier = item.TransactionItemIdentifier,
+                        UPC = item.Upc,
+                        SelectedItem = item == selectedItem
+                    };
+
+                    <form asp-page-handler="DeleteItem" method="post">
+                        <vc:receipt-item receipt-item=@receiptItem></vc:receipt-item>
+                    </form>
+                }
+            }
+            <script type="text/javascript">
+                window.onload = function () {
+                    var selected = document.getElementsByClassName('receipt-item-to-scroll-to');
+                    if (selected && selected.length === 1) {
+                        selected[0].scrollIntoView();
+                    }
+                };
+            </script>
+        </div>
+        <div class="card-footer text-muted" style="background-color: #f1f1f1 !important;">
+            <div class="row">
+                <div class="col-6">
+                    <p>Subtotal</p>
+                </div>
+                <div class="col-6">
+                    <p id="receiptSubTotalAmount" class="float-right">@Model.Transaction.Total.SubTotal.ToString("#,##0.00")</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <p>Discounts</p>
+                </div>
+                <div class="col-6 receipt-discounts">
+                    <p id="receiptDiscountAmount" class="float-right">0.00</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <p>Tax</p>
+                </div>
+                <div class="col-6">
+                    <p id="receiptTaxAmount" class="float-right">@Model.Transaction.Total.Tax.ToString("#,##0.00")</p>
+                </div>
+            </div>
+            <div class="row receipt-total">
+                <div class="col-6">
+                    <p>Total</p>
+                </div>
+                <div class="col-6">
+                    <p id="receiptTotalAmount" class="float-right">@Model.Transaction.Total.GrandTotal.ToString("#,##0.00")</p>
+                </div>
+                <div class="col-12" style="margin-top:-8px;padding-bottom:8px;"><hr /></div>
+            </div>
+            <div class="row">
+
+                @if (Model.ShowCompleteButton && Model.Transaction.Items.Count > 0)
+                {
+                    <div class="col-12 center-all">
+                        <a class="btn btn-dsg pull-right" style="width:150px;" asp-page="/TenderMenu">COMPLETE</a>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+}
+else
+{
+    <div class="card card-receipt">
+        <div class="card-header" style="background-color: #f1f1f1 !important;font-size:14pt;border:0;padding-bottom:5px">
+            <table cellpadding="0" cellspacing="0">
+                <tr>
+                    <td>Sale Transaction</td>
+                </tr>
+            </table>
+            <hr />
+        </div>
+        <div class="card-body receipt-scorecard-adj" style="background-color: #f1f1f1 !important;">
+        </div>
+        <div class="card-body receipt-item-layout-adj center-all" style="background-color: #f1f1f1 !important;height:298px !important;max-height:304px !important;">
+            <span class="font-weight-bold">Receipt Printed</span>
+        </div>
+        <div class="card-footer text-muted" style="background-color: #f1f1f1 !important;font-size:14pt;border:0;padding-bottom:5px">
+            <hr />
+            <br />
+        </div>
+    </div>
+}

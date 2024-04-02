@@ -1,0 +1,27 @@
+﻿@using Services
+@using Response = DSG.POS.PosTransactionManager.Models.Response
+
+@model Response.Header
+@inject IHeaderService HeaderService
+
+@{
+    string tooltipMessage = string.Empty;
+    if (Model == null)
+    {
+        tooltipMessage = $"Store Number: {HeaderService.StoreNumber}</br/>Register Number: {HeaderService.RegisterNumber}";
+    }
+    else
+    {
+        tooltipMessage = $"Store Number: {Model.StoreNumber}<br/>Register Number: {Model.RegisterNumber}<br/>Transaction Number: {Model.TransactionNumber}";
+    }
+}
+
+<div class="row">
+    <div class="col-2 center-all devTooltip">
+        <img src="~/img/dsgLogo_100x47.png" class="img-fluid" alt="DICKS Sporting Goods">
+        <span class="tooltiptext">@Html.Raw(tooltipMessage)</span>
+    </div>
+    <div class="col-10 center-vertical">
+        <div><h3>Hello, Teammate!</h3></div>
+    </div>
+</div>

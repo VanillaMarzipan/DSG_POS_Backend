@@ -1,0 +1,18 @@
+﻿@page
+@model PointOfSale.Pages.TenderMenuModel
+
+@{
+    ViewData["Title"] = "TenderMenu";
+}
+
+@section Header{
+    <vc:main-header header="@Model.Transaction.Header"></vc:main-header>
+    <vc:previous-page previous-page-url="/Sale"></vc:previous-page>
+    <vc:total-due total-due=@Model.Transaction.Total.GrandTotal></vc:total-due>
+}
+@section Main{
+    <vc:tender-menu></vc:tender-menu>
+}
+@section Receipt{
+    <vc:receipt transaction="@Model.Transaction" show-complete-button="false" show-receipt-printed="false"></vc:receipt>
+}

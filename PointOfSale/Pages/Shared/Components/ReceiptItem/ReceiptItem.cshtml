@@ -1,0 +1,28 @@
+﻿@model PointOfSale.Models.ReceiptItem
+
+<div class="row receipt-item@{ if (Model.SelectedItem) { WriteLiteral(" receipt-item-to-scroll-to"); } }">
+    <table>
+        <tr>
+            <td rowspan="2" class="receipt-item-selected-item-indicator"@{ if (Model.SelectedItem) { WriteLiteral(" style=\"border-left:solid 8px #006554;width:24px !important;\""); } }>&nbsp;</td>
+            <td rowspan="2" class="receipt-item-edit-menu">
+                <div class="dropdown" style="position:relative;">
+                    <a href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i style="font-size:24px;color:black;" class="fa fa-chevron-right"></i><span>EDIT</span>
+                    </a>
+                    <input type="hidden" name="transactionItemIdentifier" value="@Model.TransactionItemIdentifier" />
+                    <div class="dropdown-menu receipt-item-menu-popout" aria-labelledby="dropdownMenuLink">
+                        <a class="dropdown-item" href="#">Edit quantity</a>
+                        <a class="dropdown-item" href="#">Edit price</a>
+                        <button type="submit" class="dropdown-item float-right">Delete item</button>
+                    </div>
+                </div>
+            </td>
+            <td class="receipt-item-description">@Model.Description</td>
+            <td class="receipt-item-price"><b>@Model.Price.ToString("0.00")</b></td>
+        </tr>
+        <tr style="height:40px;vertical-align:top;">
+            <td class="receipt-item-upc">@Model.UPC</td>
+            <td class="receipt-item-quantity">Quantity: @Model.Quantity</td>
+        </tr>
+    </table>
+</div>

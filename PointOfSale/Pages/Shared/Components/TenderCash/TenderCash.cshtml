@@ -1,0 +1,28 @@
+﻿<div class="tenderCash">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 text-center font-weight-bold">
+                <span>Cash Tendered</span>
+            </div>
+        </div>
+        <div class="row">
+            &nbsp;
+        </div>
+        <form method="post" asp-page-handler="TenderWithCash">
+            <div class="col-sm-6 offset-sm-3">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="dollarSignAddon">$</span>
+                    </div>
+                    <input type="number" class="form-control currency-input" name="cashTenderAmount" autofocus="autofocus" placeholder="0.00" aria-label="0.00" aria-describedby="dollarSignAddon" min="0" step="0.01" data-number-to-fixed="2" data-number-stepfactor="100">
+                </div>
+            </div>
+            <div class="row">
+                &nbsp;
+            </div>
+            <div class="col-sm-6 offset-sm-3">
+                <button type="submit" id="cashTenderButton" class="btn btn-dsg pull-right">ENTER</button>
+            </div>
+        </form>
+    </div>
+</div>

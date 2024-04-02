@@ -1,0 +1,17 @@
+﻿@page
+@model SaleModel
+
+@{
+    ViewData["Title"] = "Sale";
+}
+
+@section Header{
+    <vc:main-header header="@Model.Transaction.Header"></vc:main-header>
+}
+@section Main{
+    <vc:scanner-input upc-lookup-result=@Model.UpcLookupResult></vc:scanner-input>
+    <vc:product-details></vc:product-details>
+}
+@section Receipt{
+    <vc:receipt transaction="@Model.Transaction" show-complete-button="true" show-receipt-printed="false"></vc:receipt>
+}

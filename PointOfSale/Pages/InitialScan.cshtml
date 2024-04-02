@@ -1,0 +1,19 @@
+﻿@page
+@model PointOfSale.Pages.InitialScanModel
+@{
+    Layout = "_NoReceiptLayout";
+    ViewData["Title"] = "InitialScan";
+}
+
+@section Header{
+    <vc:main-header header=null></vc:main-header>
+}
+@section Main{
+    <div class="row">&nbsp;</div>
+    <vc:scanner-input upc-lookup-result=@Model.UpcLookupResult></vc:scanner-input>
+    <div class="row">
+        <div class="col-12">
+            <hr />
+        </div>
+    </div>
+}

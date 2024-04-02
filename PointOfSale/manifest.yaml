@@ -1,0 +1,7 @@
+﻿---
+applications:
+- name: PointOfSale
+  buildpack: dotnet_core_buildpack
+  services:
+   - PosConfigurationServer
+   - PosDiscoveryServer

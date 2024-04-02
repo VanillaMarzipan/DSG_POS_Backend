@@ -1,0 +1,84 @@
+﻿@page
+@model PointOfSale.Pages.TenderCompleteModel
+@using Newtonsoft.Json;
+@using Response = DSG.POS.PosTransactionManager.Models.Response;
+
+@{
+    decimal TenderAmount = Model.FinalizedTransaction.Tenders[0].Amount;
+    decimal ChangeDueAmount = Model.FinalizedTransaction.Total.ChangeDue;
+    Response.Header Header = Model.FinalizedTransaction.Header;
+}
+
+@section Header{
+    <vc:main-header header="@Header"></vc:main-header>
+    <vc:cash-tendered cash-tendered=@TenderAmount></vc:cash-tendered>
+}
+@section Main{
+    <vc:change-due change-due-amount=@ChangeDueAmount></vc:change-due>
+
+
+    @*TODO: Leaving this button - but will only render when Electron isn't available (for local testing)*@
+    <br /><br />
+    <a id="CloseButton" class="btn btn-danger center-all" style="visibility:hidden" asp-page="/InitialScan">CLOSE CASH DRAWER</a>
+}
+@section Receipt{
+    <vc:receipt transaction="null" show-complete-button="false" show-receipt-printed="true"></vc:receipt>
+}
+@section PageScripts{
+    <script type="text/javascript">
+        (async () => {
+            let mode = "browser";
+
+            try {
+                // mode = CefSharp
+                await CefSharp.BindObjectAsync("boundAsync", "bound");
+                mode = "cefSharp";
+            }
+            catch (err) {
+                try {
+                    // mode = Electron.Net
+                    require('electron');
+                    mode = "electron";
+                }
+                catch (err) {
+                    // Mode = Browser
+                    mode = "browser";
+                }
+            }
+
+            console.log("Mode:[" + mode + "]");
+
+            if (mode === "cefSharp") {
+                boundAsync.OpenCashDrawer();
+                boundAsync.PrintSalesReceipt('@Html.Raw(Json.Serialize(@Model.FinalizedTransaction))');
+                await boundAsync.WaitForCashDrawerToClose();
+                document.location = '@Url.Content("/InitialScan")';
+            }
+            else if (mode === "electron") {
+                if (document.readyState == 'complete') {
+                    OpenDrawerAndWaitForClose();
+                }
+                else {
+                    document.onreadystatechange = function () {
+                        if (document.readyState === "complete") {
+                            OpenDrawerAndWaitForClose();
+                        }
+                    }
+                }
+            }
+            else {
+                document.getElementById('CloseButton').style.visibility = null;
+            }
+
+            function OpenDrawerAndWaitForClose() {
+                    const { ipcRenderer } = require('electron');
+
+                    setTimeout(function () {
+                        ipcRenderer.sendSync('cash-drawer',  '@Html.Raw(Json.Serialize(@Model.FinalizedTransaction))');
+                        ipcRenderer.sendSync('cash-drawer-close');
+                        document.location = '@Url.Content("/InitialScan")';
+                    }, 500);
+            }
+        })();
+    </script>
+}
